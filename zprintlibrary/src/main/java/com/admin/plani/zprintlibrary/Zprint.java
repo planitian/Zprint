@@ -12,13 +12,16 @@ import java.util.regex.Pattern;
  * @author plani
  */
 public class Zprint {
-    public static boolean OUT = false;
+    public static boolean OUT = true;
+
+    public static Level level = Level.DEBUG;
+
     /**
      * @param key 要输出数据的标识
      * @param out 动态参数，这里是要输出的数据
      */
     public static void log(@Nullable String key, Object... out) {
-        if (OUT) {
+        if (!OUT) {
             return;
         }
         //得到信息
@@ -71,7 +74,7 @@ public class Zprint {
      * @param operation 传回值  可以操作   注意 值类型
      */
     public static <T> void log(@Nullable String key, T objects, Operation<T> operation) {
-        if (OUT) {
+        if (!OUT) {
             return;
         }
         //得到信息
@@ -132,7 +135,7 @@ public class Zprint {
      * @param operationTwo
      */
     public static <T, J> void log(@Nullable String key, T objects, Operation<T> operation, J objectsTwo, Operation<J> operationTwo) {
-        if (OUT) {
+        if (!OUT) {
             return;
         }
         //得到信息
@@ -195,7 +198,7 @@ public class Zprint {
      * @param operations  操作
      */
     public static <T> void log(@Nullable String key, T[] objects, Operation<T>... operations) {
-        if (OUT) {
+        if (!OUT) {
             return;
         }
         //得到信息
@@ -323,5 +326,25 @@ public class Zprint {
         result[1] = methodName;
         result[2] = String.valueOf(lines);
         return result;
+    }
+
+    public  enum Level{
+        WARN,//默认蓝色
+        DEBUG,//默认 黑色
+        ERROR,//默认黑色
+    }
+    private static void log(String TAG,String content){
+        switch (level){
+            case DEBUG:
+                Log.d(TAG, content.toString());
+                break;
+            case WARN:
+                Log.w(TAG, content.toString());
+                break;
+            case ERROR:
+                Log.e(TAG, content.toString());
+                break;
+        }
+
     }
 }
