@@ -13,9 +13,19 @@ import java.util.regex.Pattern;
  */
 public class Zprint {
     public static boolean OUT = true;
-
+    /*默认debug*/
     public static Level level = Level.DEBUG;
 
+    private static String pre;
+    private static String end;
+    static {
+        StringBuilder stringBuilder = new StringBuilder();
+        for (int i = 0; i <500 ; i++) {
+            stringBuilder.append("-");
+        }
+        pre = end = stringBuilder.toString();
+        end = "代码操作结束" + end;
+    }
     /**
      * @param key 要输出数据的标识
      * @param out 动态参数，这里是要输出的数据
@@ -45,24 +55,27 @@ public class Zprint {
         String parameter;
         if (key == null || key.trim().isEmpty()) {
             parameter = "方法method ：" + methodName + "  输出： " + temp;
-            Log.d(TAG, parameter);
         } else {
             if (out.length == 0) {
                 parameter = "方法method ：" + methodName + "  输出： " + "\"" + key + "\"";
             } else {
                 parameter = "方法method ：" + methodName + "  输出： " + "\"" + key + "\"" + " ::" + temp;
             }
-            Log.d(TAG, parameter);
         }
+        print(TAG, parameter);
+        level = Level.DEBUG;
     }
 
 
     /**
+     * note  这个方法弃用，这个第一个参数 总是会变为key
      * 和上面方法功能相同，少了 key
      *
      * @param out 动态参数，这里是要输出的数据
+     *
      */
-    public static void log(Object... out) {
+
+    private static void log(Object... out) {
       log(null,out);
     }
 
@@ -88,30 +101,17 @@ public class Zprint {
         //上面标识
         String parameter;
         if (key == null || key.trim().isEmpty()) {
-            parameter = "方法method ：" + methodName + "  输出代码操作-------------------【";
-            Log.d(TAG, parameter);
+            parameter = "方法method ：" + methodName + "  输出代码操作"+pre;
         } else {
-            parameter = "方法method ：" + methodName + "  输出： " + "\"" + key + "\"" +" ::  "+ "输出代码操作-------------------【";
-            Log.d(TAG, parameter);
+            parameter = "方法method ：" + methodName + "  输出： " + "\"" + key + "\"" +" ::  "+ "输出代码操作"+pre;
         }
+        print(TAG, parameter);
         //内容
         operation.operation(objects);
-        //生成结束标志
-        String blank = "-";
-        StringBuilder end = new StringBuilder("输出代码操作-------------------】");
-        int gap = parameter.length() - end.length();//获取 上面的开始标志 和下面结束 相差几个长度
-        int paraChinese = chineseCounts(parameter);//得到上面的 汉字个数
-        int endChinese = chineseCounts(end.toString());//得到下面的汉字个数
-        //因为 汉字 相当于两个英文字母
-        gap += (paraChinese - endChinese);
-        //有时候上面标志 英文字数 是奇数 会导致上面 比下面长一块
-        if ((parameter.length()-paraChinese)%2!=0){
-            gap++;//补齐下面长度
-        }
-        for (int i = 0; i < gap; i++)
-            end.insert(0, blank);
 
-        Log.d(TAG, end.toString());
+        print(TAG, end);
+
+        level = Level.DEBUG;//变回debug
     }
 
     /**
@@ -148,33 +148,17 @@ public class Zprint {
         //上面标识
         String parameter;
         if (key == null || key.trim().isEmpty()) {
-            parameter = "方法method ：" + methodName + "  输出代码操作-------------------【";
-            Log.d(TAG, parameter);
+            parameter = "方法method ：" + methodName + "  输出代码操作"+pre;
         } else {
-            parameter = "方法method ：" + methodName + "  输出： " + "\"" + key + "\"" +" ::  "+ "输出代码操作-------------------【";
-            Log.d(TAG, parameter);
+            parameter = "方法method ：" + methodName + "  输出： " + "\"" + key + "\"" +" ::  "+ "输出代码操作"+pre;
         }
+        print(TAG,parameter);
         //内容
         operation.operation(objects);
         operationTwo.operation(objectsTwo);
 
-        //生成结束标志
-        String blank = "-";
-        StringBuilder end = new StringBuilder("输出代码操作-------------------】");
-        int gap = parameter.length() - end.length();//获取 上面的开始标志 和下面结束 相差几个长度
-        int paraChinese = chineseCounts(parameter);//得到上面的 汉字个数
-        int endChinese = chineseCounts(end.toString());//得到下面的汉字个数
-        //因为 汉字 相当于两个英文字母
-        gap += (paraChinese - endChinese);
-
-        //有时候上面标志 英文字数 是奇数 会导致上面 比下面长一块
-        if ((parameter.length()-paraChinese)%2!=0){
-            gap++;//补齐下面长度
-        }
-        for (int i = 0; i < gap; i++)
-            end.insert(0, blank);
-
-        Log.d(TAG, end.toString());
+        print(TAG, end);
+        level = Level.DEBUG;
     }
 
     /**
@@ -212,35 +196,20 @@ public class Zprint {
         //上面标识
         String parameter;
         if (key == null || key.trim().isEmpty()) {
-            parameter = "方法method ：" + methodName + "  输出代码操作-------------------【";
-            Log.d(TAG, parameter);
+            parameter = "方法method ：" + methodName + "  输出代码操作"+pre;
         } else {
-            parameter = "方法method ：" + methodName + "  输出： " + "\"" + key + "\"" +" ::  "+ "输出代码操作-------------------【";
-            Log.d(TAG, parameter);
+            parameter = "方法method ：" + methodName + "  输出： " + "\"" + key + "\"" +" ::  "+ "输出代码操作"+pre;
         }
+        print(TAG, parameter);
         //内容
         if (objects != null && operations != null) {
             for (int i = 0, j = 0; i < objects.length && j < operations.length; i++) {
                 operations[i].operation(objects[i]);
             }
         }
-        //生成结束标志
-        String blank = "-";
-        StringBuilder end = new StringBuilder("输出代码操作-------------------】");
-        int gap = parameter.length() - end.length();//获取 上面的开始标志 和下面结束 相差几个长度
-        int paraChinese = chineseCounts(parameter);//得到上面的 汉字个数
-        int endChinese = chineseCounts(end.toString());//得到下面的汉字个数
-        //因为 汉字 相当于两个英文字母
-        gap += (paraChinese - endChinese);
 
-        //有时候上面标志 英文字数 是奇数 会导致上面 比下面长一块
-        if ((parameter.length()-paraChinese)%2!=0){
-            gap++;//补齐下面长度
-        }
-        for (int i = 0; i < gap; i++)
-            end.insert(0, blank);
-
-        Log.d(TAG, end.toString());
+        print(TAG,end);
+        level = Level.DEBUG;
     }
 
     /**
@@ -260,6 +229,7 @@ public class Zprint {
     }
 
     /**
+     * 废弃
      * @param content 内容
      * @return 返回字符串中的中文个数 没有返回0
      */
@@ -333,7 +303,7 @@ public class Zprint {
         DEBUG,//默认 黑色
         ERROR,//默认黑色
     }
-    private static void log(String TAG,String content){
+    private static void print(String TAG,String content){
         switch (level){
             case DEBUG:
                 Log.d(TAG, content.toString());
@@ -345,6 +315,5 @@ public class Zprint {
                 Log.e(TAG, content.toString());
                 break;
         }
-
     }
 }
