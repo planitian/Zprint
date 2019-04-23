@@ -3,6 +3,7 @@ package com.admin.plani.zprintlibrary;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import java.io.File;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -12,20 +13,51 @@ import java.util.regex.Pattern;
  * @author plani
  */
 public class Zprint {
+    /*是否输出日志  默认输出*/
     public static boolean OUT = true;
     /*默认debug*/
     public static Level level = Level.DEBUG;
+    /*是否将日志输入到文件，默认不输出*/
+    private static boolean isWrite;
 
     private static String pre;
     private static String end;
+
     static {
         StringBuilder stringBuilder = new StringBuilder();
-        for (int i = 0; i <500 ; i++) {
+        for (int i = 0; i < 200; i++) {
             stringBuilder.append("-");
         }
         pre = end = stringBuilder.toString();
         end = "代码操作结束" + end;
     }
+
+    /**
+     * @param path 文件路径
+     * @return
+     */
+    public static boolean startWrite(String path) {
+        try {
+            File file = new File(path);
+            if (file.exists()) {
+                System.out.println("文件存在");
+                if (!file.canWrite()) {
+                    Log.e(Thread.currentThread().getName(), "开启写入log异常");
+                    throw new IllegalStateException("文件存在，但是不可写入");
+                }
+            }
+            System.out.println("配置开始 ");
+            isWrite = true;
+            PlaniLog.path = path;
+            PlaniLog.pre();
+        } catch (Exception e) {
+            System.out.println("异常抛出   ");
+            Log.e(Thread.currentThread().getName(), "开启写入log异常", e);
+        }
+        System.out.println("最后返回 ");
+        return false;
+    }
+
     /**
      * @param key 要输出数据的标识
      * @param out 动态参数，这里是要输出的数据
@@ -72,11 +104,10 @@ public class Zprint {
      * 和上面方法功能相同，少了 key
      *
      * @param out 动态参数，这里是要输出的数据
-     *
      */
 
     private static void log(Object... out) {
-      log(null,out);
+        log(null, out);
     }
 
     /**
@@ -101,9 +132,9 @@ public class Zprint {
         //上面标识
         String parameter;
         if (key == null || key.trim().isEmpty()) {
-            parameter = "方法method ：" + methodName + "  输出代码操作"+pre;
+            parameter = "方法method ：" + methodName + "  输出代码操作" + pre;
         } else {
-            parameter = "方法method ：" + methodName + "  输出： " + "\"" + key + "\"" +" ::  "+ "输出代码操作"+pre;
+            parameter = "方法method ：" + methodName + "  输出： " + "\"" + key + "\"" + " ::  " + "输出代码操作" + pre;
         }
         print(TAG, parameter);
         //内容
@@ -119,10 +150,10 @@ public class Zprint {
      *
      * @param objects   值
      * @param operation 传回值  可以操作   注意 值类型
-     * @param <T> 第一个参数泛型
+     * @param <T>       第一个参数泛型
      */
     public static <T> void log(T objects, Operation<T> operation) {
-      log(null,objects,operation);
+        log(null, objects, operation);
     }
 
     /**
@@ -148,11 +179,11 @@ public class Zprint {
         //上面标识
         String parameter;
         if (key == null || key.trim().isEmpty()) {
-            parameter = "方法method ：" + methodName + "  输出代码操作"+pre;
+            parameter = "方法method ：" + methodName + "  输出代码操作" + pre;
         } else {
-            parameter = "方法method ：" + methodName + "  输出： " + "\"" + key + "\"" +" ::  "+ "输出代码操作"+pre;
+            parameter = "方法method ：" + methodName + "  输出： " + "\"" + key + "\"" + " ::  " + "输出代码操作" + pre;
         }
-        print(TAG,parameter);
+        print(TAG, parameter);
         //内容
         operation.operation(objects);
         operationTwo.operation(objectsTwo);
@@ -170,7 +201,7 @@ public class Zprint {
      * @param operationTwo
      */
     public static <T, J> void log(T objects, Operation<T> operation, J objectsTwo, Operation<J> operationTwo) {
-      log(null,objects,operation,objectsTwo,operationTwo);
+        log(null, objects, operation, objectsTwo, operationTwo);
     }
 
 
@@ -179,7 +210,7 @@ public class Zprint {
      *
      * @param key        要输出数据的标识
      * @param objects    值
-     * @param operations  操作
+     * @param operations 操作
      */
     public static <T> void log(@Nullable String key, T[] objects, Operation<T>... operations) {
         if (!OUT) {
@@ -196,9 +227,9 @@ public class Zprint {
         //上面标识
         String parameter;
         if (key == null || key.trim().isEmpty()) {
-            parameter = "方法method ：" + methodName + "  输出代码操作"+pre;
+            parameter = "方法method ：" + methodName + "  输出代码操作" + pre;
         } else {
-            parameter = "方法method ：" + methodName + "  输出： " + "\"" + key + "\"" +" ::  "+ "输出代码操作"+pre;
+            parameter = "方法method ：" + methodName + "  输出： " + "\"" + key + "\"" + " ::  " + "输出代码操作" + pre;
         }
         print(TAG, parameter);
         //内容
@@ -208,7 +239,7 @@ public class Zprint {
             }
         }
 
-        print(TAG,end);
+        print(TAG, end);
         level = Level.DEBUG;
     }
 
@@ -219,7 +250,7 @@ public class Zprint {
      * @param operations
      */
     public static <T> void log(T[] objects, Operation<T>... operations) {
-      log(null,objects,operations);
+        log(null, objects, operations);
     }
 
     //内部接口  之所以不用Consumer  是因为 这个对android api有限制
@@ -230,6 +261,7 @@ public class Zprint {
 
     /**
      * 废弃
+     *
      * @param content 内容
      * @return 返回字符串中的中文个数 没有返回0
      */
@@ -250,7 +282,6 @@ public class Zprint {
     }
 
     /**
-     *
      * @return 返回类名 方法 行数信息
      */
     private static String[] obtainInfo() {
@@ -264,7 +295,7 @@ public class Zprint {
         int last = 0;
         //得到堆栈 里面存储着 类名，方法 行号 最上面的是最近的方法
         StackTraceElement[] s = Thread.currentThread().getStackTrace();
-        for (int i = 0; i <s.length ; i++) {
+        for (int i = 0; i < s.length; i++) {
             if (s[i].getClassName().contains("Zprint")) {
                 last = i;
             }
@@ -277,7 +308,7 @@ public class Zprint {
         last++;
         //会有lambda表达式 会让方法属性 在下一行
         if (s[last].getMethodName().contains("lambda")) {
-            methodName = s[last+1].getMethodName();
+            methodName = s[last + 1].getMethodName();
         } else {
             methodName = s[last].getMethodName();
         }
@@ -298,13 +329,14 @@ public class Zprint {
         return result;
     }
 
-    public  enum Level{
+    public enum Level {
         WARN,//默认蓝色
         DEBUG,//默认 黑色
         ERROR,//默认黑色
     }
-    private static void print(String TAG,String content){
-        switch (level){
+
+    private static void print(String TAG, String content) {
+        switch (level) {
             case DEBUG:
                 Log.d(TAG, content.toString());
                 break;
@@ -315,5 +347,7 @@ public class Zprint {
                 Log.e(TAG, content.toString());
                 break;
         }
+        if (isWrite)
+            PlaniLog.writeLog(content);
     }
 }
