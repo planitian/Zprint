@@ -7,6 +7,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -19,7 +20,7 @@ class PlaniLog {
     private static ReentrantLock reentrantLock = new ReentrantLock();//可重入锁
     private static Condition empty = reentrantLock.newCondition();
     static String path;//文件位置
-    static int SIZE = 2;//以兆为单位
+    static int SIZE = 1;//以兆为单位
     private static StringBuilder stringBuilder = new StringBuilder();
     private static volatile Boolean isRun = true;//标志 当前 线程池里面的线程 是否结束
     static int BUFFE_SIZE = 5;//缓存 默认5
@@ -29,7 +30,7 @@ class PlaniLog {
         concurrentLinkedQueue = new ConcurrentLinkedQueue<>();
     }
 
-    public static void pre() {
+    static void pre() {
         if (path == null) {
             throw new IllegalStateException("请先设置好 文件路径");
         }
@@ -74,8 +75,12 @@ class PlaniLog {
         });
     }
 
+    /**
+     * 写入内容
+     * @param content
+     */
     static void writeLog(String content) {
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MM-dd HH:mm:ss");
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MM-dd HH:mm:ss", Locale.getDefault());
         String time = simpleDateFormat.format(new Date()) + "    " + content;
         concurrentLinkedQueue.add(time);
         boolean lock;
@@ -85,6 +90,13 @@ class PlaniLog {
         }
     }
 
+    /**
+     * 创建文件，整个文件夹及文件都创建
+     * @param path   文件路径
+     * @param isFile  true 是文件 ，false 是目录
+     * @return  文件
+     * @throws IOException
+     */
     private static File createFile(String path, boolean isFile) throws IOException {
         File file = new File(path);
         if (!file.exists()) {//不存在
@@ -98,7 +110,8 @@ class PlaniLog {
                 file.mkdir();
             }
         } else if (file.isFile() != isFile) {//如果 有相同的文件夹或文件 和path重名，但类型不一样
-            file.delete();//先删除
+            //先删除
+            file.delete();
             createFile(path, isFile);//再重新进入
         }
         return file;

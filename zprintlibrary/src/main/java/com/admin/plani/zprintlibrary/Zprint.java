@@ -36,7 +36,8 @@ public class Zprint {
      * @param path 文件路径
      * @return
      */
-    public static boolean startWrite(String path) {
+    public static void startWrite(String path) {
+        System.out.println("log文件地址  预期 " + path);
         try {
             File file = new File(path);
             if (file.exists()) {
@@ -54,8 +55,6 @@ public class Zprint {
             System.out.println("异常抛出   ");
             Log.e(Thread.currentThread().getName(), "开启写入log异常", e);
         }
-        System.out.println("最后返回 ");
-        return false;
     }
 
     /**
