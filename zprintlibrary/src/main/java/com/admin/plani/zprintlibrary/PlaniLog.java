@@ -23,7 +23,7 @@ class PlaniLog {
     static int SIZE = 1;//以兆为单位
     private static StringBuilder stringBuilder = new StringBuilder();
     private static volatile Boolean isRun = true;//标志 当前 线程池里面的线程 是否结束
-    static int BUFFE_SIZE = 5;//缓存 默认5
+    static int BUFFE_SIZE = 1;//缓存 默认1
 
     static {
         executorService = Executors.newSingleThreadExecutor();
