@@ -1,10 +1,14 @@
 package com.admin.plani.zprintlibrary;
 
-import android.util.Log;
+import android.os.Build;
+import android.support.annotation.RequiresApi;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -90,36 +94,15 @@ class PlaniLog {
         }
     }
 
-    /**
-     * 创建文件，整个文件夹及文件都创建
-     * @param path   文件路径
-     * @param isFile  true 是文件 ，false 是目录
-     * @return  文件
-     * @throws IOException
-     */
-    private static File createFile(String path, boolean isFile) throws IOException {
-        File file = new File(path);
-        if (!file.exists()) {//不存在
-            String parent = file.getParent();//得到父母，如果返回空 ，那么就到顶了
-            if (parent != null) {
-                createFile(parent, false);//因为是父母，所以肯定不是file；
-            }
-            if (isFile) {
-                file.createNewFile();
-            } else {
-                file.mkdir();
-            }
-        } else if (file.isFile() != isFile) {//如果 有相同的文件夹或文件 和path重名，但类型不一样
-            //先删除
-            file.delete();
-            createFile(path, isFile);//再重新进入
-        }
-        return file;
-    }
 
-    private static void write(String path, String content) throws IOException {
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    private static void write(String pathStr, String content) throws IOException {
         check(path);
-        File file = createFile(path, true);
+        Path path = Paths.get(pathStr);
+        if (!Files.isDirectory(path)) {
+            Files.createDirectories(path.getParent());
+        }
+        File file = Files.createFile(path).toFile();
         FileWriter fileWriter = new FileWriter(file, true);//追加模式写入
         fileWriter.write(content);
         fileWriter.flush();
